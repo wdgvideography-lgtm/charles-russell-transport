@@ -420,6 +420,7 @@
         </select>
       </div>
       <div class="cf-f"><label>Project Details</label><textarea rows="5" placeholder="Describe your load, origin, destination, timescale and any special requirements..."></textarea></div>
+      <p style="font-size:12px;opacity:.7;margin:10px 0">This opens your email app with your enquiry ready to send. We only use your details to reply to you.</p>
       <button type="submit" class="cf-sub">Send Enquiry &rarr;</button>
     </form>
   </div>
@@ -488,7 +489,19 @@
   document.querySelectorAll('.rv,.rl').forEach(el=>obs.observe(el));
 
   // FORM
-  function subForm(e){e.preventDefault();const b=e.target.querySelector('.cf-sub');b.textContent='Enquiry Sent \u2713';b.style.background='#1a5c2e';}
+  // The form has no server behind it, so it opens the visitor's email app with the enquiry
+  // filled in, addressed to Ben. (Before, it showed "Enquiry Sent" and nothing was sent.)
+  function subForm(e){
+    e.preventDefault();
+    const f=e.target, v=s=>{const el=f.querySelector(s);return el?el.value.trim():'';};
+    const inputs=f.querySelectorAll('input');
+    const first=inputs[0].value.trim(), last=inputs[1].value.trim(), company=inputs[2].value.trim(), email=inputs[3].value.trim(), phone=inputs[4].value.trim();
+    const service=v('select'), details=v('textarea');
+    const body=['Name: '+first+' '+last, company&&('Company: '+company), 'Email: '+email, phone&&('Phone: '+phone), 'Service: '+service, '', details].filter(x=>x!=='' && x!==false).join('\n');
+    window.location.href='mailto:ben.russell@russell-transport.com?subject='+encodeURIComponent('Website enquiry: '+service)+'&body='+encodeURIComponent(body);
+    const b=f.querySelector('.cf-sub'); b.textContent='Opening your email app\u2026';
+    setTimeout(()=>{b.innerHTML='Send Enquiry &rarr;';},4000);
+  }
 
   // MOBILE NAV
   function mobNav(){
